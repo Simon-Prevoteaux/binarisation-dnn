@@ -29,7 +29,13 @@ def main(filename):
 	saveConfig(config)
 
 	print('Creation of the data')
-	generate_data(ds_train_sample,ds_train_GT,config)
+	print('Training data set')
+	x_train, y_train=generate_data(ds_train_sample,ds_train_GT,config)
+	print('Test data set')
+	x_test, y_test=generate_data(ds_test_sample,ds_test_GT,config)
+
+	#remains to convert the data sets from list to numpy array
+
 
 def getConfig():
     config={}
@@ -38,11 +44,12 @@ def getConfig():
 
     return config
 
-def saveConfig(config,path='results'):
+def saveConfig(config,name='configuration.json',path='results'):
 	print('Saving used configuration')
-	json.dump(config,open(os.path.join(path,"configuration.json"),'wb'),indent=2)
+	json.dump(config,open(os.path.join(path,name),'wb'),indent=2)
 
-    
+
+
 def generate_data(sample,gt,config):
 	"""
 	Permit to generate data from two sets
@@ -50,15 +57,26 @@ def generate_data(sample,gt,config):
 	Args:
 		sample : the set corresponding containing all the raw images we want to crop
 		gt : the groundTruth of the binarisation of the sample set
+		config : the configuration containing different parameters on how generating data.
 	"""
 
 	temp=sample.common_images(gt)
 
-	print(len(temp))
+	x=[]
+	y=[]
+	for name in temp:
+		print('loading image ',name)
+		sampleImTemp=sample.open_image(name)
+		sampleImTemp=sampleImTemp.convert('L') #convert into greyscale image
+
+		gtImTemp=gt.open_image(name)
+		generate_data_from_image(sampleImTemp,config,x)
+		generate_data_from_image(gtImTemp,config,y)
+
+	return x,y
 
 
-
-def generate_data_from_image(image,bloc_size,space):
+def generate_data_from_image(image,config,result):
 	"""
 		Allow to get a list of arrays, each one containing a bloc_size*bloc_size part of the image.
 
@@ -67,14 +85,16 @@ def generate_data_from_image(image,bloc_size,space):
 			config : the configuration containing different parameters on how generating data.
 	"""
 
+	bloc_size=config['bloc_size']
+	space=config['space']
+
 	width, height = image.size   # Get dimensions
-	result=[]
+
 	for i in range(0,width-bloc_size,space):
 		for j in range(0,height-bloc_size,space):
 			temp=image.crop((i,j,i+bloc_size,j+bloc_size))
 			result.append(np.asarray(temp.getdata()))
-	
-	return result
+
 
 
 
