@@ -6,6 +6,7 @@ import sys
 import numpy as np
 import json
 import os
+import pickle 
 
 def main(filename):
 
@@ -34,7 +35,26 @@ def main(filename):
 	print('Test data set')
 	x_test, y_test=generate_data(ds_test_sample,ds_test_GT,config)
 
-	#remains to convert the data sets from list to numpy array
+
+	x_train=np.asarray(x_train)
+	y_train=np.asarray(y_train)
+
+	x_test=np.asarray(x_test)
+	y_test=np.asarray(y_test)
+
+	train_set={}
+	train_set['x_train']=x_train
+	train_set['y_train']=y_train
+
+	test_set={}
+	test_set['x_test']=x_test
+	test_set['y_test']=y_test
+
+	print('Saving data')
+
+	pickle.dump(train_set,open(os.path.join('results',"training_set.pck"),'w'),protocol=-1)
+	pickle.dump(test_set,open(os.path.join('results',"testing_set.pck"),'w'),protocol=-1)
+
 
 
 def getConfig():
