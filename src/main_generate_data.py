@@ -35,6 +35,8 @@ def main(filename):
 	print('Test data set')
 	x_test, y_test=generate_data(ds_test_sample,ds_test_GT,config)
 
+	
+	#faire une selection aléatoire des patchs ???	
 
 	x_train=np.asarray(x_train)
 	y_train=np.asarray(y_train)
@@ -59,8 +61,8 @@ def main(filename):
 
 def getConfig():
     config={}
-    config['bloc_size'] = 16
-    config['space'] = 16
+    config['bloc_size'] = 50
+    config['space'] = 25
 
     return config
 
@@ -121,7 +123,7 @@ def generate_data_from_image(image,config,result):
 if __name__=='__main__':
 
 	if (len(sys.argv)<2):
-		dataDir='./data'
+		dataDir='./dataSauvola'
 	else:
 		dataDir=sys.argv[1:][0]
 
