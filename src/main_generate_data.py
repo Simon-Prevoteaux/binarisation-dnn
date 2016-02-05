@@ -30,40 +30,39 @@ def main(filename):
 	saveConfig(config)
 
 	print('Creation of the data')
-	print('Training data set')
-	x_train, y_train=generate_data(ds_train_sample,ds_train_GT,config)
-	print('Test data set')
-	x_test, y_test=generate_data(ds_test_sample,ds_test_GT,config)
-
-	
-	#faire une selection aléatoire des patchs ???	
-
+	print('Train dataset')
+	x_train, y_train=generate_data(ds_train_sample,ds_train_GT,config,random=False)
 	x_train=np.asarray(x_train)
 	y_train=np.asarray(y_train)
-
-	x_test=np.asarray(x_test)
-	y_test=np.asarray(y_test)
-
 	train_set={}
 	train_set['x_train']=x_train
 	train_set['y_train']=y_train
+	pickle.dump(train_set,open(os.path.join('results',"training_set.pck"),'w'),protocol=-1)
+	del x_train
+	del y_train
+	del train_set
 
+	print('Test set')
+	x_test, y_test=generate_data(ds_test_sample,ds_test_GT,config,random=False)
+	x_test=np.asarray(x_test)
+	y_test=np.asarray(y_test)
 	test_set={}
 	test_set['x_test']=x_test
 	test_set['y_test']=y_test
-
-	print('Saving data')
-
-	pickle.dump(train_set,open(os.path.join('results',"training_set.pck"),'w'),protocol=-1)
 	pickle.dump(test_set,open(os.path.join('results',"testing_set.pck"),'w'),protocol=-1)
 
+	del x_test
+	del y_test
+	del test_set
+	
+	print('Done')
 
 
 def getConfig():
     config={}
     config['bloc_size'] = 50
-    config['space'] = 25
-
+    config['space'] = 300
+    config['patch_number'] = 2000
     return config
 
 def saveConfig(config,name='configuration.json',path='results'):
@@ -72,7 +71,7 @@ def saveConfig(config,name='configuration.json',path='results'):
 
 
 
-def generate_data(sample,gt,config):
+def generate_data(sample,gt,config,random=False):
 	"""
 	Permit to generate data from two sets
 
@@ -92,11 +91,38 @@ def generate_data(sample,gt,config):
 		sampleImTemp=sampleImTemp.convert('L') #convert into greyscale image
 
 		gtImTemp=gt.open_image(name)
-		generate_data_from_image(sampleImTemp,config,x)
-		generate_data_from_image(gtImTemp,config,y)
+
+		if random:
+			generate_data_from_image_randomly(sampleImTemp,config,x)
+			generate_data_from_image_randomly(gtImTemp,config,y)
+		else:
+			generate_data_from_image(sampleImTemp,config,x)
+			generate_data_from_image(gtImTemp,config,y)
 
 	return x,y
 
+
+def generate_data_from_image_randomly(image,config,result):
+	"""
+		Allow to get a list of arrays, each one containing a patch of the image. The patchs are generated randomly on the whole image.
+
+		Args
+			image : the image we want go get data on
+			config : the configuration containing different parameters on how generating data.
+
+	"""
+	### how can we handle the overlaping of patchs ???? ######
+
+	bloc_size=config['bloc_size']
+	space=config['space']
+	patchs=config['patch_number']
+
+	width, height = image.size   # Get dimensions
+
+	k=0
+	#while(k<patchs):
+
+	pass
 
 def generate_data_from_image(image,config,result):
 	"""

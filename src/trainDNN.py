@@ -15,6 +15,12 @@ def main(dataDir):
 	y_train=training_set['y_train']
 
 
+def loadDataConfig(name='configuration.json',path='results'):
+	print('Loading used configuration')
+	return json.load(open(os.path.join(path,name),'rb'))
+
+
+
 if __name__=='__main__':
 
 	if (len(sys.argv)<2):
