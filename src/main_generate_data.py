@@ -37,7 +37,7 @@ def main(filename):
 	train_set={}
 	train_set['x_train']=x_train
 	train_set['y_train']=y_train
-	pickle.dump(train_set,open(os.path.join('results',"training_set.pck"),'w'),protocol=-1)
+	pickle.dump(train_set,open(os.path.join('data',"training_set.pck"),'w'),protocol=-1)
 	del x_train
 	del y_train
 	del train_set
@@ -49,7 +49,7 @@ def main(filename):
 	test_set={}
 	test_set['x_test']=x_test
 	test_set['y_test']=y_test
-	pickle.dump(test_set,open(os.path.join('results',"testing_set.pck"),'w'),protocol=-1)
+	pickle.dump(test_set,open(os.path.join('data',"testing_set.pck"),'w'),protocol=-1)
 
 	del x_test
 	del y_test
