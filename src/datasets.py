@@ -21,14 +21,21 @@ class DataSet(object):
                 self.imagespaths[name] = self.folder + '/' + filename
 
     def images_names(self):
-        """Returns a list of preloaded image names."""
+        """
+        Returns:
+            List[str]: Preloaded images names.
+        """
         return self.imagespaths.keys()
 
     def open_image(self, imagename):
-        """Opens an image.
+        """
+        Opens an image.
 
         Args:
-            imagename Name of the image, as returned by images_names (relative path without the extension).
+            imagename (str): Name of the image, as returned by images_names (relative path without the extension).
+
+        Returns:
+            PIL.Image: Loaded image, or None if the image could not be loaded.
         """
         try:
             return Image.open(self.imagespaths[imagename])
@@ -43,6 +50,14 @@ class DataSet(object):
         self.imagespaths = {}
 
     def common_images(self, other):
-        """Find common images between two data sets (=same size, same name)."""
+        """
+        Find common images between two data sets (=same name).
+
+        Args:
+            other (DataSet): Other data set.
+        
+        Returns
+            Set[str]: Names of all the common images.
+        """
         return self.imagespaths.viewkeys() & other.imagespaths.viewkeys()
 

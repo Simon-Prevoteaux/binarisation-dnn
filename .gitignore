@@ -64,3 +64,18 @@ target/
 #Eclim
 workbench.xmi
 
+# swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+# persistent undo 
+*.un~
+# session
+Session.vim
+# temporary
+.netrwhist
+*~
+
+#Speicific for this project
+config.json
+generation_params.pck
+
