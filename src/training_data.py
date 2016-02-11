@@ -171,13 +171,13 @@ def priv_gen_data(config, gen_config, dataset):
     data = np.empty([pcount, psize * psize], np.ubyte)
     i = 0
     for (imgname, coords) in gen_config.iteritems():
-        with dataset.open_image(imgname) as img:
-            (w, h) = img.size
-            # Load image as 2D array
-            imgdata = np.reshape(img.convert('L').getdata(), (h, w), np.ubyte)
-            for (x, y) in coords:
-                # Get the patch as 1D array
-                data[i, :] = imgdata[y:y + psize, x:x + psize].reshape((1, psize * psize))
-                i += 1
+        img = dataset.open_image(imgname)
+        (w, h) = img.size
+        # Load image as 2D array
+        imgdata = np.reshape(img.convert('L').getdata(), (h, w), np.ubyte)
+        for (x, y) in coords:
+            # Get the patch as 1D array
+            data[i, :] = imgdata[y:y + psize, x:x + psize].reshape((1, psize * psize))
+            i += 1
     return data
 
