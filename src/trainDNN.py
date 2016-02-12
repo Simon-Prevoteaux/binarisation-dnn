@@ -44,29 +44,29 @@ def getConfig():
 
     #Learning parameters of the input pretraining
     input_pretraining_params={
-            'learning_rate': 10.0,
-            'batch_size' : 10000,
-            'epochs' : 50
+            'learning_rate': 1.0,
+            'batch_size' : 100,
+            'epochs' : 30
     }
     #Learning parameters of the output pretraining
     output_pretraining_params={
-            'learning_rate': 10.0,
-            'batch_size' : 10000,
+            'learning_rate': 1.0,
+            'batch_size' : 100,
             'epochs' : 10
     }
     
     #Learning parameters of the supervised training + pretrainings
     config['learning_params']={
-        'learning_rate' : 10.0,
-        'batch_size' : 10000,
-        'epochs' : 150,
+        'learning_rate' : 1.0,
+        'batch_size' : 100,
+        'epochs' : 70,
         'input_pretraining_params' : input_pretraining_params,
         'output_pretraining_params' : output_pretraining_params,
         'link_pretraining' : False
     }
     
     #Size of one hidden representation
-    hidden_size = 2*64
+    hidden_size = 2*100
     #Geometry of all hidden representations 
     config['hidden_geometry'] = [hidden_size, hidden_size]
 
@@ -108,7 +108,7 @@ def load_data(dataDir):
     try:
         genconf = data.load_gen_config('generation_params.pck')
     except IOError:
-        genconf = data.random_gen_config(1000)
+        genconf = data.random_gen_config(10)
         try:
             data.save_gen_config('generation_params.pck', genconf)
         except IOError:
@@ -117,6 +117,7 @@ def load_data(dataDir):
     samples_data = data.generate_input_data(genconf)
     gt_data = data.generate_ground_truth_data(genconf)
     print samples_data.shape[0], 'training samples were generated.'
+    print 'each sample have size ', samples_data.shape[1]
     return samples_data, gt_data
 
 if __name__=='__main__':
