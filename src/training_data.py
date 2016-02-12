@@ -168,16 +168,16 @@ class TrainingData(object):
 def priv_gen_data(config, gen_config, dataset):
     pcount = sum([coords.shape[0] for coords in gen_config.itervalues()])
     psize = config['patch_size']
-    data = np.empty([pcount, psize * psize], np.ubyte)
+    data = np.empty([pcount, psize * psize], np.uint8)
     i = 0
     for (imgname, coords) in gen_config.iteritems():
-        img = dataset.open_image(imgname)
+        img = dataset.open_image(imgname).convert('L')
         (w, h) = img.size
         # Load image as 2D array
-        imgdata = np.reshape(img.convert('L').getdata(), (h, w), np.ubyte)
+        print (w, h)
         for (x, y) in coords:
             # Get the patch as 1D array
-            data[i, :] = imgdata[y:y + psize, x:x + psize].reshape((1, psize * psize))
+            data[i, :] = img.crop((x, y, x + psize, y + psize)).getdata()
             i += 1
     return data
 

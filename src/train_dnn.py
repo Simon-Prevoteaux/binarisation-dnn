@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 from datasets import DataSet
@@ -11,32 +11,32 @@ import pickle
 from math import sqrt
 
 def main():
-	needed_params=['learning_params','hidden_geometry','pretraining_geometry','init_weights','save_init_weights','outfolder']
-	config = getConfig()
-	used_config={}
-	for aParam in needed_params:
-		if not( aParam in config.keys()):
-			raise ValueError("Experience configuration does not contain %s parameter"%(aParam))
-		if aParam!='init_weights':
-			used_config[aParam]=config[aParam]
-		elif not (config[aParam] is None):
-			used_config['init_weights'] = []
+    needed_params=['learning_params','hidden_geometry','pretraining_geometry','init_weights','save_init_weights','outfolder']
+    config = getConfig()
+    used_config={}
+    for aParam in needed_params:
+        if not( aParam in config.keys()):
+            raise ValueError("Experience configuration does not contain %s parameter"%(aParam))
+        if aParam!='init_weights':
+            used_config[aParam]=config[aParam]
+        elif not (config[aParam] is None):
+            used_config['init_weights'] = []
 
-	learning_params=config['learning_params']
-	hidden_geometry=config['hidden_geometry']
-	pretraining_geometry=config['pretraining_geometry']
-	init_weights=config['init_weights']
-	save_init_weights=config['save_init_weights']
-	outfolder=config['outfolder']
+    learning_params=config['learning_params']
+    hidden_geometry=config['hidden_geometry']
+    pretraining_geometry=config['pretraining_geometry']
+    init_weights=config['init_weights']
+    save_init_weights=config['save_init_weights']
+    outfolder=config['outfolder']
 
-	absoutfolder=os.path.abspath(outfolder)
-	if not os.path.exists(absoutfolder):
-		os.mkdir(absoutfolder)
+    absoutfolder=os.path.abspath(outfolder)
+    if not os.path.exists(absoutfolder):
+        os.mkdir(absoutfolder)
 
-	print('... saving used configuration')
-	json.dump(used_config,open(os.path.join(absoutfolder,"dnn_configuration.json"),'wb'),indent=2)
+    print('... saving used configuration')
+    json.dump(used_config,open(os.path.join(absoutfolder,"dnn_configuration.json"),'wb'),indent=2)
     
-        x_train, y_train=load_data('dataSauvola')
+    x_train, y_train=load_data('dataSauvola')
 
 def getConfig():
     config={}
@@ -88,8 +88,8 @@ def getConfig():
     return config
 
 def loadDataConfig(name='configuration.json',path='data'):
-	print('Loading used configuration')
-	return json.load(open(os.path.join(path,name),'rb'))
+    print('Loading used configuration')
+    return json.load(open(os.path.join(path,name),'rb'))
 
 def load_data(dataDir):
     print 'Loading datasets...'
@@ -117,8 +117,8 @@ def load_data(dataDir):
     samples_data = data.generate_input_data(genconf)
     gt_data = data.generate_ground_truth_data(genconf)
     print samples_data.shape[0], 'training samples were generated.'
-    print 'each sample have size ', samples_data.shape[1]
+    print 'Each sample contains', samples_data.shape[1], 'pixels.'
     return samples_data, gt_data
 
 if __name__=='__main__':
-	main()
+    main()
