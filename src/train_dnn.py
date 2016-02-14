@@ -42,8 +42,9 @@ def main():
     json.dump(used_config,open(os.path.join(absoutfolder,"dnn_configuration.json"),'wb'),indent=2)
 
     #decomment the two lines above if you want to generate you own data and save it
-    #x_train, y_train=load_data('dataSauvola') # generate data
-    #save_training_data('training_data',x_train,y_train) #save the generated data
+
+    x_train, y_train=load_data('dataSauvola/train/') # generate data
+    save_training_data('training_data',x_train,y_train) #save the generated data
 
     x_train,y_train=load_data_from_file('training_data') #load the saved data
 
@@ -100,20 +101,20 @@ def getConfig():
     #Learning parameters of the input pretraining
     input_pretraining_params={
             'learning_rate': 1.0,
-            'batch_size' : 1000,
+            'batch_size' : 100,
             'epochs' : 10
     }
     #Learning parameters of the output pretraining
     output_pretraining_params={
             'learning_rate': 1.0,
-            'batch_size' : 1000,
+            'batch_size' : 100,
             'epochs' : 10
     }
 
     #Learning parameters of the supervised training + pretrainings
     config['learning_params']={
         'learning_rate' : 1.0,
-        'batch_size' : 1000,
+        'batch_size' : 100,
         'epochs' : 30,
         'input_pretraining_params' : input_pretraining_params,
         'output_pretraining_params' : output_pretraining_params,
@@ -155,35 +156,36 @@ def loadDataConfig(name='dnn_configuration.json',path='results'):
     print('Loading used configuration')
     return json.load(open(os.path.join(path,name),'rb'))
 
-def load_data(dataDir):
+def load_data(dataDir,nb_random_patchs=50):
     """
         Load the data for a use
 
         Args:
             dataDir (str) : the directory we want to use for generating the dataDir
+            nb_random_patchs (int) : the number of patchs per image if we use a random generation of data
 
         Returns:
             numpy.array : Array containing the generated data
     """
     print 'Loading datasets...'
-    ds_train_samples = DataSet(dataDir+'/train/samples')
-    ds_train_gt = DataSet(dataDir+'/train/groundTruth')
+    ds_train_samples = DataSet(dataDir+'samples')
+    ds_train_gt = DataSet(dataDir+'groundTruth')
     print 'Loading data generation parameters...'
     data = TrainingData(ds_train_samples, ds_train_gt)
     try:
-        data.load_config_file('config.json')
+        data.load_config_file(dataDir+'config.json')
     except IOError:
         data.config['patch_size'] = 100
         try:
-            data.save_config_file('config.json')
+            data.save_config_file(dataDir+'config.json')
         except IOError:
             print 'Cannot save configuration file.'
     try:
-        genconf = data.load_gen_config('generation_params.pck')
+        genconf = data.load_gen_config(dataDir+'generation_params.pck')
     except IOError:
-        genconf = data.random_gen_config(150)
+        genconf = data.random_gen_config(nb_random_patchs)
         try:
-            data.save_gen_config('generation_params.pck', genconf)
+            data.save_gen_config(dataDir+'generation_params.pck', genconf)
         except IOError:
             print 'Cannot save generation parameters.'
     print 'Generating data...'
@@ -230,6 +232,9 @@ def normalise(temp):
 
         Args:
             input (numpy.array) : the matrix to normalise
+
+        Returns:
+            numpy.array : the normalized array
 	"""
         temp=temp/float(255)
         temp.astype(theano.config.floatX)
