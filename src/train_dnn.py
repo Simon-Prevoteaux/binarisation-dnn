@@ -14,6 +14,7 @@ import theano.tensor as T
 import crino
 from crino.network import PretrainedMLP
 from crino.criterion import MeanSquareError
+from crino.criterion import CrossEntropy
 
 def main():
     needed_params=['learning_params','hidden_geometry','pretraining_geometry','init_weights','save_init_weights','outfolder']
@@ -43,11 +44,11 @@ def main():
 
     #decomment the two lines above if you want to generate you own data and save it
 
-    x_train, y_train=load_data('dataSauvola/train/') # generate data
-    save_training_data('training_data',x_train,y_train) #save the generated data
+    #x_train, y_train=load_data('dataSauvola/train/') # generate data
+    #save_training_data('training_data',x_train,y_train) #save the generated data
 
     x_train,y_train=load_data_from_file('training_data') #load the saved data
-
+    #print(np.unique(x_train))
     nApp = x_train.shape[0] # number of training examples
     nFeats = x_train.shape[1] # number of features per input image
     nLabels = y_train.shape[1] # number of labels per groundtruth
@@ -63,8 +64,8 @@ def main():
     # bake the ioda and set the criterion 
     ioda.linkInputs(T.matrix('x'), nFeats)
     ioda.prepare()
-    ioda.criterion = MeanSquareError(ioda.outputs, T.matrix('y'))
-    
+    #ioda.criterion = MeanSquareError(ioda.outputs, T.matrix('y'))
+    ioda.criterion= CrossEntropy(ioda.outputs, T.matrix('y'))
     # set initial weights if they exists
     if not(init_weights is None):
         ioda.setParameters(init_weights)
@@ -100,20 +101,20 @@ def getConfig():
 
     #Learning parameters of the input pretraining
     input_pretraining_params={
-            'learning_rate': 1.0,
+            'learning_rate': 10,
             'batch_size' : 100,
             'epochs' : 10
     }
     #Learning parameters of the output pretraining
     output_pretraining_params={
-            'learning_rate': 1.0,
+            'learning_rate': 10,
             'batch_size' : 100,
             'epochs' : 10
     }
 
     #Learning parameters of the supervised training + pretrainings
     config['learning_params']={
-        'learning_rate' : 1.0,
+        'learning_rate' : 10,
         'batch_size' : 100,
         'epochs' : 30,
         'input_pretraining_params' : input_pretraining_params,
