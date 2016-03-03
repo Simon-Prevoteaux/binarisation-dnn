@@ -15,10 +15,17 @@ import crino
 from crino.network import PretrainedMLP
 from crino.criterion import MeanSquareError
 from crino.criterion import CrossEntropy
+from math import sqrt
+
+from matplotlib import pyplot as plt
+
 
 def main():
+    # DEFINE PATCH SIZE
+    patch_size=30
+
     needed_params=['learning_params','hidden_geometry','pretraining_geometry','init_weights','save_init_weights','outfolder']
-    config = getConfig()
+    config = getConfig(patch_size)
     used_config={}
     for aParam in needed_params:
         if not( aParam in config.keys()):
@@ -44,12 +51,11 @@ def main():
 
     #decomment the two lines above if you want to generate you own data and save it
 
-    #x_train, y_train=load_data('dataSauvola/train/') # generate data
+    x_train, y_train=load_data('dataSauvola/train/',patch_size=patch_size,nb_random_patchs=25) # generate data
     #save_training_data('training_data',x_train,y_train) #save the generated data
+    #x_train,y_train=load_data_from_file('training_data') #load the saved data
 
-    x_train,y_train=load_data_from_file('training_data') #load the saved data
-
-    #print(np.unique(y_train)) que des 0 et des 1
+    #test_data(x_train,y_train)
 
     nApp = x_train.shape[0] # number of training examples
     nFeats = x_train.shape[1] # number of features per input image
@@ -94,7 +100,7 @@ def main():
         }
     pickle.dump(results,open(os.path.join(absoutfolder,'results.pck'),'w'),protocol=-1)
 
-def getConfig():
+def getConfig(patch_size):
     """
         Enable to get the configuration for the Neural Network
     """
@@ -116,25 +122,25 @@ def getConfig():
 
     #Learning parameters of the supervised training + pretrainings
     config['learning_params']={
-        'learning_rate' : 10,
-        'batch_size' : 100,
-        'epochs' : 0,
+        'learning_rate' : 0.1,
+        'batch_size' : 1,
+        'epochs' : 50,
         'input_pretraining_params' : input_pretraining_params,
         'output_pretraining_params' : output_pretraining_params,
         'link_pretraining' : False
     }
 
     #Size of one hidden representation
-    #hidden_size = 2*100
-    hidden_size=600
+    hidden_size = 4*patch_size
+    #hidden_size=600
     #Geometry of all hidden representations
     config['hidden_geometry'] = [hidden_size, hidden_size]
 
     #How many layers are pretrained
     # (here 1 at input and 1 at output)
     config['pretraining_geometry']={
-        'nInputLayers': 1,
-        'nOutputLayers': 1
+        'nInputLayers': 0,
+        'nOutputLayers': 0
     }
 
     #Shall we used known init weights (here no)
@@ -160,7 +166,7 @@ def loadDataConfig(name='dnn_configuration.json',path='results'):
     print('Loading used configuration')
     return json.load(open(os.path.join(path,name),'rb'))
 
-def load_data(dataDir,nb_random_patchs=50):
+def load_data(dataDir,patch_size=25,nb_random_patchs=50):
     """
         Load the data for a use
 
@@ -169,7 +175,7 @@ def load_data(dataDir,nb_random_patchs=50):
             nb_random_patchs (int) : the number of patchs per image if we use a random generation of data
 
         Returns:
-            numpy.array : Array containing the generated data
+            numpy.array : Array containing the normalised generated data
     """
     print 'Loading datasets...'
     ds_train_samples = DataSet(dataDir+'samples')
@@ -178,8 +184,10 @@ def load_data(dataDir,nb_random_patchs=50):
     data = TrainingData(ds_train_samples, ds_train_gt)
     try:
         data.load_config_file(dataDir+'config.json')
+        if (data.config['patch_size']!=patch_size):
+            data.config['patch_size']= patch_size
     except IOError:
-        data.config['patch_size'] = 100
+        data.config['patch_size'] = patch_size
         try:
             data.save_config_file(dataDir+'config.json')
         except IOError:
@@ -197,6 +205,8 @@ def load_data(dataDir,nb_random_patchs=50):
     gt_data = data.generate_ground_truth_data(genconf)
     print samples_data.shape[0], 'training samples were generated.'
     print 'Each sample contains', samples_data.shape[1], 'pixels.'
+    samples_data=normalise(samples_data)
+    gt_data=normalise(gt_data)
     return samples_data, gt_data
 
 def load_data_from_file(filename):
@@ -224,15 +234,36 @@ def save_training_data(filename,x_train,y_train):
         filename (str) : the name file in which we want to save the data
         x_train, y_train (numpy array) : the training data we want to save,
     """
-    print 'Saving training data'
-    x_train=normalise(x_train)
-    y_train=normalise(y_train)
     temp={'x_train': x_train, 'y_train' : y_train}
     pickle.dump(temp,open(os.path.join('./results/',filename),'w'),protocol=-1)
 
+def test_data(x,y):
+    """
+        Test function allowing to visualize the data and printing the values
+
+        Args
+            x, y (numpy.array) : a test matrix
+
+    """
+    for i in xrange(0, len(x)):
+        n=x.shape[1]
+        sqrtn=sqrt(n)
+        image = x[i].reshape(sqrtn,sqrtn)
+        gt = y[i].reshape(sqrtn,sqrtn)
+        print(np.unique(image))
+        print(np.unique(gt))
+
+        plt.subplot(1,2,1)
+        plt.imshow(image, interpolation='nearest', cmap=plt.get_cmap('gray'), vmin=0.0, vmax=1.0)
+        plt.title('Original image')
+        plt.subplot(1,2,2)
+        plt.imshow(gt, interpolation='nearest', cmap=plt.get_cmap('gray'), vmin=0.0, vmax=1.0)
+        plt.title('Groundtruth binarized image')
+        plt.show()
+
 def normalise(temp):
 	"""
-		Allow to normalise a matrix
+		Allow to normalise a matrix and convert it the float type used by theano (float32)
 
         Args:
             input (numpy.array) : the matrix to normalise
