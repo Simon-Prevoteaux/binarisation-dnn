@@ -2,6 +2,7 @@ from datasets import DataSet
 import json
 import pickle
 import numpy as np
+import theano
 
 class TrainingData(object):
     """
@@ -67,7 +68,7 @@ class TrainingData(object):
             ValueError: If the generation configuration was not valid.
 
         Returns:
-            numpy.array: Array containing the input data.
+            numpy.ndarray(dtype=theano.config.floatX): Array containing the input data.
         """
         return priv_gen_data(self.config, gen_config, self.samples)
 
@@ -83,7 +84,7 @@ class TrainingData(object):
             ValueError: If the generation configuration was not valid.
 
         Returns:
-            numpy.array: Array containing the input data.
+            numpy.ndarray(dtype=theano.config.floatX): Array containing the input data.
         """
         return priv_gen_data(self.config, gen_config, self.ground_truth)
 
@@ -116,7 +117,7 @@ class TrainingData(object):
         Creates a generation configuration containing the whole images.
 
         Args:
-            patches_padding (numpy.array): (x, y) padding between each patch of the image.
+            patches_padding (numpy.ndarray): (x, y) padding between each patch of the image.
 
         Returns:
             Generation configuration.
@@ -168,15 +169,15 @@ class TrainingData(object):
 def priv_gen_data(config, gen_config, dataset):
     pcount = sum([coords.shape[0] for coords in gen_config.itervalues()])
     psize = config['patch_size']
-    data = np.empty([pcount, psize * psize], np.uint8)
+    data = np.empty([pcount, psize * psize], theano.config.floatX)
     i = 0
     for (imgname, coords) in gen_config.iteritems():
-        img = dataset.open_image(imgname).convert('L')
+        img = dataset.open_image(imgname).convert('F')
         (w, h) = img.size
-        # Load image as 2D array
+        # Load image as a 2D array
         print (w, h)
         for (x, y) in coords:
-            # Get the patch as 1D array
+            # Get the patch as a 1D array
             data[i, :] = img.crop((x, y, x + psize, y + psize)).getdata()
             i += 1
     return data
