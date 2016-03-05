@@ -1,27 +1,26 @@
 {
-  "learning_params": {
-    "input_pretraining_params": {
-      "epochs": 10, 
-      "learning_rate": 10, 
-      "batch_size": 500
-    }, 
-    "learning_rate": 0.1, 
-    "batch_size": 1, 
-    "epochs": 50, 
-    "output_pretraining_params": {
-      "epochs": 0, 
-      "learning_rate": 10, 
-      "batch_size": 100
-    }, 
-    "link_pretraining": false
-  }, 
   "hidden_geometry": [
-    120, 
+    120,
     120
-  ], 
-  "pretraining_geometry": {
-    "nOutputLayers": 0, 
-    "nInputLayers": 0
+  ],
+  "learning_params": {
+    "learning_rate": 0.1,
+    "batch_size": 1,
+    "epochs": 50,
+    "link_pretraining": false,
+    "input_pretraining_params": {
+      "epochs": 10,
+      "learning_rate": 10,
+      "batch_size": 1
+    },
+    "output_pretraining_params": {
+      "epochs": 0,
+      "learning_rate": 10,
+      "batch_size": 1
+    }
   },
-  "patches_size": 50
+  "pretraining_geometry": {
+    "nOutputLayers": 0,
+    "nInputLayers": 0
+  }
 }

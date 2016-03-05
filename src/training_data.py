@@ -180,5 +180,5 @@ def priv_gen_data(config, gen_config, dataset):
             # Get the patch as a 1D array
             data[i, :] = img.crop((x, y, x + psize, y + psize)).getdata()
             i += 1
-    return data
+    return data / 255.0
 

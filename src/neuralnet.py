@@ -6,29 +6,31 @@ import numpy
 import theano.tensor as T
 import crino
 
-NEURALNET_REQUIRED_PARAMS = ['learning_params', 'patches_size', 'hidden_geometry', 'pretraining_geometry']
+NEURALNET_REQUIRED_PARAMS = ['learning_params', 'hidden_geometry', 'pretraining_geometry']
 
 class NeuralNetwork(object):
     def __init(self):
         super(NeuralNetwork, self).__init__()
         self.initialised = False
         self.learning_params = None
-        self.patches_size = None
+        self.features_count = None
         self.hidden_geometry = None
         self.pretraining_geometry = None
         self.network = None
 
     # TODO: Documentation for config format.
-    def initialise(self, config_values):
+    def initialise(self, features_count, config_values):
         """
         Initialises the neural network with given configuration values.
 
         Args:
+            features_count (int): Size of the input vectors.
             config_values (dict): Configuration values for the neural network.
 
         Raises:
             ValueError: If the configuration values were not valid.
         """
+        self.features_count = features_count
         for k, v in config_values.items():
             if not k in NEURALNET_REQUIRED_PARAMS:
                 raise ValueError('Unknown configuration parameter: ' + str(k))
@@ -39,11 +41,12 @@ class NeuralNetwork(object):
         self.priv_create_network()
         self.initialised = True
 
-    def initialise_from_file(self, config_filepath):
+    def initialise_from_file(self, features_count, config_filepath):
         """
         Initialises the neural network using a json configuration file.
 
         Args:
+            features_count (int): Size of the input vectors.
             config_filepath (str): Path of the configuration file.
 
         Raises:
@@ -51,7 +54,7 @@ class NeuralNetwork(object):
             ValueError: If the configuration values were not valid.
         """
         config_values = json.load(open(config_filepath, 'r'))
-        self.initialise(config_values)
+        self.initialise(features_count, config_values)
 
     def save_config_to_file(self, config_filepath, weights_filepath=None):
         """
@@ -105,8 +108,6 @@ class NeuralNetwork(object):
         Args:
             input_patches (numpy.ndarray): Input data that will be used to train the network.
             output_patches (numpy.ndarray): Output data that will be used to train the network.
-
-        
         """
         assert self.initialised, "The neural network must be initialised first."
         delta_time = self.network.train(input_patches, output_patches, **self.learning_params)
@@ -136,8 +137,8 @@ class NeuralNetwork(object):
         return output
 
     def priv_create_network(self):
-        self.network = crino.network.PretrainedMLP([self.patches_size] + self.hidden_geometry + [self.patches_size], outputActivation=crino.module.Sigmoid, **self.pretraining_geometry)
-        self.network.setInputs(T.matrix('x'), self.patches_size)
+        self.network = crino.network.PretrainedMLP([self.features_count] + self.hidden_geometry + [self.features_count], outputActivation=crino.module.Sigmoid, **self.pretraining_geometry)
+        self.network.setInputs(T.matrix('x'), self.features_count)
         self.network.prepare()
         self.network.setCriterion(crino.criterion.CrossEntropy(self.network.getOutputs(), T.matrix('nn_output')))
 
