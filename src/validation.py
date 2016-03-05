@@ -61,8 +61,10 @@ def main():
             nn.setParameters(pickle.load(open(weight_folder+'/'+param)))
             for i in xrange(0, nTest):
                 estimated_binarisation = nn.forward(x_test[i:i+1])
-                y_est=treshold(estimated_binarisation)
-                validation_error[k]+=jaccard_index(y_est[0],y_test[i])
+                y_est=threshold(estimated_binarisation)
+                validation_error[k]+=(1-jaccard_index(y_est[0],y_test[i]))
+                #validation_error[k]+=sum(y_test[0]!=y_test)/float(nTest)
+            validation_error[k]=validation_error[k]/float(nTest)
             k+=1
 
         pickle.dump(validation_error,open(os.path.join(absoutfolder,'jaccard_index.pck'),'w'),protocol=-1)
@@ -70,16 +72,16 @@ def main():
         print(validation_error)
         plt.subplot(1,1,1)
         plt.plot(validation_error)
-        plt.title('jaccard index')
+        plt.title('validation error using jaccard index')
         plt.show()
 
 def jaccard_index(y_est,y_true):
     return sum(np.logical_and(y_est,y_true))/float(sum(np.logical_or(y_est,y_true)))
 
-def treshold(nn_output):
-    treshold=0.5
-    nn_output[nn_output<treshold]=0
-    nn_output[nn_output>=treshold]=1
+def threshold(nn_output):
+    threshold=0.5
+    nn_output[nn_output<threshold]=0
+    nn_output[nn_output>=threshold]=1
     return nn_output
 
 if __name__=='__main__':
