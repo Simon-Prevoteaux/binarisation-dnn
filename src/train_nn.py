@@ -22,7 +22,7 @@ from matplotlib import pyplot as plt
 
 def main():
     # DEFINE PATCH SIZE
-    patch_size=30
+    patch_size=20
 
     needed_params=['learning_params','hidden_geometry','pretraining_geometry','init_weights','save_init_weights','outfolder']
     config = getConfig(patch_size)
@@ -51,9 +51,9 @@ def main():
 
     #decomment the two lines above if you want to generate you own data and save it
 
-    x_train, y_train=load_data('dataSauvola/train/',patch_size=patch_size,nb_random_patchs=25) # generate data
+    #x_train, y_train=load_data('dataSauvola/train/',patch_size=patch_size,nb_random_patchs=25) # generate data
     #save_training_data('training_data',x_train,y_train) #save the generated data
-    #x_train,y_train=load_data_from_file('training_data') #load the saved data
+    x_train,y_train=load_data_from_file('training_data') #load the saved data
 
     #test_data(x_train,y_train)
 

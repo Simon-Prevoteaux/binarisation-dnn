@@ -16,7 +16,7 @@ from math import sqrt
 
 
 # DEFINE PATCH SIZE
-patch_size=30
+patch_size=20
 
 outfolder = "./results/"
 
@@ -40,12 +40,10 @@ nn.linkInputs(T.matrix('x'), nFeats)
 nn.prepare()
 nn.setParameters(pickle.load(open('./results/learned_params.pck')))
 
-print(np.unique(nn.getParameters()))
 
 for i in xrange(0, nTest):
     image = x_test[i].reshape(sqrt(nFeats),sqrt(nFeats))
     estimated_binarisation = nn.forward(x_test[i:i+1])
-    print(np.unique(estimated_binarisation))
     estimated_image = estimated_binarisation.reshape(sqrt(nFeats),sqrt(nFeats))
     gt = y_test[i].reshape(sqrt(nFeats),sqrt(nFeats))
     
