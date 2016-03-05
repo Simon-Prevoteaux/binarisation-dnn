@@ -203,7 +203,7 @@ def load_data(dataDir,patch_size=25,nb_random_patchs=50):
     print 'Generating data...'
     samples_data = data.generate_input_data(genconf)
     gt_data = data.generate_ground_truth_data(genconf)
-    print samples_data.shape[0], 'training samples were generated.'
+    print samples_data.shape[0], 'samples were generated.'
     print 'Each sample contains', samples_data.shape[1], 'pixels.'
     samples_data=normalise(samples_data)
     gt_data=normalise(gt_data)

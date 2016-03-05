@@ -78,4 +78,5 @@ Session.vim
 #Speicific for this project
 config.json
 generation_params.pck
-
+dataSauvola/*
+results/*
