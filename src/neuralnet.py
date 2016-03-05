@@ -1,4 +1,10 @@
+from datasets import DataSet
+from training_data import TrainingData
 import json
+import pickle
+import numpy
+import theano.tensor as T
+import crino
 
 NEURALNET_REQUIRED_PARAMS = ['learning_params', 'patches_size', 'hidden_geometry', 'pretraining_geometry']
 
@@ -121,7 +127,7 @@ class NeuralNetwork(object):
         # Allow forwarding of a single patch
         one_patch = len(input_patches.shape) == 1
         if one_patch:
-            input_patches = array([input_patches])
+            input_patches = numpy.array([input_patches])
         output = self.network.forward(input_patches)
         # Return a vector instead of a matrix if a single patch was sent
         if one_patch:
