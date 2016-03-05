@@ -29,7 +29,7 @@ class NeuralNetwork(object):
         Raises:
             ValueError: If the configuration values were not valid.
         """
-        for k, v in config_values:
+        for k, v in config_values.items():
             if not k in NEURALNET_REQUIRED_PARAMS:
                 raise ValueError('Unknown configuration parameter: ' + str(k))
             setattr(self, k, v)
@@ -53,9 +53,9 @@ class NeuralNetwork(object):
         config_values = json.load(open(config_filepath, 'r'))
         self.initialise(config_values)
 
-    def save_to_file(self, config_filepath, weights_filepath=None):
+    def save_config_to_file(self, config_filepath, weights_filepath=None):
         """
-        Saves the neural network to a file.
+        Saves the neural network configuration to a file.
 
         Args:
             filepath (str): Path of the file in which the neural network will be saved.
@@ -64,9 +64,10 @@ class NeuralNetwork(object):
             IOError: If the file could not be opened/read.
         """
         assert self.initialised, "The neural network must be initialised first."
+        config_values = dict()
         for k in NEURALNET_REQUIRED_PARAMS:
-            config_values[k] = getattr(k)
-        json.dump(open(config_filepath, 'w+'))
+            config_values[k] = getattr(self, k)
+        json.dump(config_values, open(config_filepath, 'w+'))
 
     def load_weights(self, weights_filepath):
         """
@@ -93,7 +94,7 @@ class NeuralNetwork(object):
             IOError: If the file could not be opened/written.
         """
         assert self.initialised, "The neural network must be initialised first."
-        pickle.dump(self.network.getParameters(open(weights_filepath, 'w+')))
+        pickle.dump(self.network.getParameters(), open(weights_filepath, 'w+'))
 
     def train(self, input_patches, output_patches):
         """
@@ -135,8 +136,8 @@ class NeuralNetwork(object):
         return output
 
     def priv_create_network(self):
-        self.network = crino.network.PretrainedMLP([self.patch_size] + self.hidden_geometry + [self.patch_size], outputActivation=crino.module.Sigmoid, **pretraining_geometry)
-        self.network.setInputs(T.matrix('x'), self.patch_size)
+        self.network = crino.network.PretrainedMLP([self.patches_size] + self.hidden_geometry + [self.patches_size], outputActivation=crino.module.Sigmoid, **self.pretraining_geometry)
+        self.network.setInputs(T.matrix('x'), self.patches_size)
         self.network.prepare()
-        self.network.setCriterion(CrossEntropy(self.network.getOutputs()))
+        self.network.setCriterion(crino.criterion.CrossEntropy(self.network.getOutputs(), T.matrix('nn_output')))
 

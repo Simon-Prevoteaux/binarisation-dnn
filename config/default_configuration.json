@@ -22,5 +22,6 @@
   "pretraining_geometry": {
     "nOutputLayers": 0, 
     "nInputLayers": 0
-  }
+  },
+  "patches_size": 50
 }
