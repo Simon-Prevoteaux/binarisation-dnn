@@ -75,7 +75,7 @@ Session.vim
 .netrwhist
 *~
 
-#Speicific for this project
+#Specific for this project
 config.json
 generation_params.pck
 dataSauvola/*
