@@ -1,4 +1,4 @@
-from datasets import DataSet
+from binarisation.datasets import DataSet
 import json
 import pickle
 import numpy as np
@@ -28,6 +28,20 @@ class TrainingData(object):
         self.ground_truth = ground_truth
         self.config = {'patch_size': 64}
 
+    def set_config(self, config):
+        """
+        Loads the training data set configuration from a dictionary.
+
+        Args:
+            config (str): Configuration dictionary.
+
+        Raises:
+            ValueError: If the dictionary was not a valid configuration dictionary.
+        """
+        if not ('patch_size' in config):
+            raise ValueError('Invalid configuration: no patch_size attribute.')
+        self.config = config 
+
     def load_config_file(self, config_file_name):
         """
         Loads the training data set configuration from a Json configuration file.
@@ -40,9 +54,7 @@ class TrainingData(object):
             ValueError: If the file was not a valid configuration file.
         """
         temp = json.load(open(config_file_name, 'r'))
-        if not ('patch_size' in temp):
-            raise ValueError('Invalid configuration in file ' + config_file_name)
-        self.config = temp
+        set_config(temp)
 
     def save_config_file(self, config_file_name):
         """

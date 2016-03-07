@@ -1,5 +1,5 @@
-from datasets import DataSet
-from training_data import TrainingData
+from binarisation.datasets import DataSet
+from binarisation.training_data import TrainingData
 import json
 import pickle
 import numpy
