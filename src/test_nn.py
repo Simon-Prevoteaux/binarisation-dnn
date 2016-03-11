@@ -36,7 +36,7 @@ nLabels = y_test.shape[1] # number of labels per groundtruth
 
 nn = MultiLayerPerceptron([nFeats] + config['hidden_geometry'] + [nLabels], outputActivation=crino.module.Sigmoid)
 
-nn.linkInputs(T.matrix('x'), nFeats)
+nn.setInputs(T.matrix('x'), nFeats)
 nn.prepare()
 nn.setParameters(pickle.load(open('./results/learned_params.pck')))
 

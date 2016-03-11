@@ -70,7 +70,7 @@ def main():
     ioda = PretrainedMLP(geometry, outputActivation=crino.module.Sigmoid,**pretraining_geometry)
     
     # bake the ioda and set the criterion 
-    ioda.linkInputs(T.matrix('x'), nFeats)
+    ioda.setInputs(T.matrix('x'), nFeats)
     ioda.prepare()
     #ioda.criterion = MeanSquareError(ioda.outputs, T.matrix('y'))
     ioda.criterion= CrossEntropy(ioda.outputs, T.matrix('y'))
