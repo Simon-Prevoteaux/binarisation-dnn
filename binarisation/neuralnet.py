@@ -138,6 +138,12 @@ class NeuralNetwork(object):
         assert self.initialised, "The neural network must be initialised first."
         self.network.setLoggingFile(log_file)
         delta_time = self.network.train(input_patches, output_patches, **self.learning_params)
+        # Reord the last set of weights if it has not been
+        if log_file != None:
+            epoch_id = self.learning_params['epochs'] - 1
+            if epoch_id not in self.network.logged_epochs:
+                print 'Logging epoch ' + str(epoch_id) + '...'
+                self.save_weights(log_file, epoch_id)
         print "Training complete (" + str(delta_time) + " seconds)."
 
     def apply(self, input_patches):
