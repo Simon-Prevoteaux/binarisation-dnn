@@ -56,19 +56,6 @@ def main():
         print "Validating model " + model_filename + "..."
         model_filename = os.path.join(models_dir, model_filename + ".model")
         validate(model, model_filename, input_data, output_data)
-    
-#    # Create output directory if necessary
-#    if not os.path.exists(models_dir):
-#        os.makedirs(models_dir)
-#    # Train each model
-#    for i in range(project.get_models_count()):
-#        model = project.get_model(i)
-#        model_name = project.get_model_name(i)
-#        print 'Training model ' + model_name + '...'
-#        model.train(input_data, output_data)
-#        model_path = os.path.join(output_dir, model_name + '.model')
-#        print 'Saving model as ' + model_path + '...'
-#        model.save_weights(model_path)
 
 if __name__ == '__main__':
     main()
