@@ -24,8 +24,9 @@ def validate(model, model_filename, input_data, output_data):
         except EOFError:
             break
         print "Epoch " + str(epoch_id)
-        validation_error = 0
+        # Compute the estimate
         estimate = model.apply(input_data)
+        # Compute Jaccard distance between the estimate and the ground truth
         binarised_estimate = threshold(estimate)
         print "Jaccard distance: " + str(jaccard_distance(binarised_estimate, output_data))
     model_file.close()
@@ -52,6 +53,7 @@ def main():
     output_data = validation_dataset.generate_ground_truth_data(validation_genconfig)
     print str(input_data.shape[0]) + " validation samples were generated."
     print "Each sample contains " + str(input_data.shape[1]) + " pixels."
+    # Validate each model
     for i in range(project.get_models_count()):
         model = project.get_model(i)
         model_filename = project.get_model_name(i)
