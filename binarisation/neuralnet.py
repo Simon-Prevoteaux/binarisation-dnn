@@ -72,32 +72,32 @@ class NeuralNetwork(object):
             config_values[k] = getattr(self, k)
         json.dump(config_values, open(config_filepath, 'w+'))
 
-    def load_weights(self, weights_filepath):
+    def load_weights(self, weights_file):
         """
         Loads all the weights of the neural network from a file.
 
         Args:
-            weights_filepath (str): Path of the file from which the weights will be loaded.
+            weights_file (file): File from which the weights will be loaded.
 
         Raises:
             IOError: If the file could not be opened/read.
             ValueError: If the loaded weights were not compatible with the network.
         """
         assert self.initialised, "The neural network must be initialised first."
-        self.network.setParameters(pickle.load(open(weights_filepath, 'r')))
+        self.network.setParameters(pickle.load(weights_file))
 
-    def save_weights(self, weights_filepath):
+    def save_weights(self, weights_file):
         """
         Saves all the weights of the neural network to a file.
 
         Args:
-            weights_filepath (str): Path of the file in which the weights will be saved.
+            weights_file (file): File in which the weights will be saved.
 
         Raises:
-            IOError: If the file could not be opened/written.
+            IOError: If the file weights could not be written to the file.
         """
         assert self.initialised, "The neural network must be initialised first."
-        pickle.dump(self.network.getParameters(), open(weights_filepath, 'w+'))
+        pickle.dump(self.network.getParameters(), weights_file)
 
     def train(self, input_patches, output_patches):
         """

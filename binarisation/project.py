@@ -33,9 +33,8 @@ class Project(object):
     def get_validation_dataset(self):
         if self.validation == None:
             print 'Generating validation dataset configuration...'
-            dataset = TrainingData(DataSet(self.config['validation']['samples']), DataSet(self.config['validation'].ground_truth))
-            dataset.set_config({'patch_size': self.config['patch_size']})
-            self.validation = self.load_gen_config.get(self.config['validation']['generation_type'])(dataset, self.config['validation'])
+            self.validation = TrainingData(DataSet(self.config['validation']['samples']), DataSet(self.config['validation']['ground_truth']))
+            self.validation.set_config({'patch_size': self.config['patch_size']})
         return self.validation
 
     def get_validation_genconfig(self):
@@ -52,7 +51,6 @@ class Project(object):
             print 'Configuring model ' + self.config['models'][i]['name'] + '...'
             self.models[i] = NeuralNetwork()
             patch_size = self.config['patch_size']
-            print 'Featules count: ' + str(patch_size ** 2)
             self.models[i].initialise(self.config['patch_size'] ** 2, self.config['models'][i]['network'])
         return self.models[i]
 
