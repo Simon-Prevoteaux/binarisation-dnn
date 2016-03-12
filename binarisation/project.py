@@ -48,10 +48,11 @@ class Project(object):
 
     def get_model(self, i):
         if self.models[i] == None:
-            print 'Configuring model ' + self.config['models'][i]['name'] + '...'
+            model_config = self.config['models'][i]
+            print 'Configuring model ' + model_config['name'] + '...'
             self.models[i] = NeuralNetwork()
             patch_size = self.config['patch_size']
-            self.models[i].initialise(self.config['patch_size'] ** 2, self.config['models'][i]['network'])
+            self.models[i].initialise(self.config['patch_size'] ** 2, range(0, model_config['network']['learning_params']['epochs'], model_config['logging_period']), model_config['network'])
         return self.models[i]
 
     def get_model_name(self, i):

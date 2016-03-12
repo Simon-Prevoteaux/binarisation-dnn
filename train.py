@@ -69,10 +69,8 @@ def main():
         model = project.get_model(i)
         model_name = project.get_model_name(i)
         print 'Training model ' + model_name + '...'
-        model.train(input_data, output_data)
         model_path = os.path.join(output_dir, model_name + '.model')
-        print 'Saving model as ' + model_path + '...'
-        model.save_weights(open(model_path, 'wb+'))
+        model.train(input_data, output_data, open(model_path, 'wb+'))
 
 if __name__ == '__main__':
     main()

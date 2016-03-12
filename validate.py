@@ -17,11 +17,16 @@ def threshold(estimate):
 
 def validate(model, model_filename, input_data, output_data):
     model_file = open(model_filename, 'rb')
-    model.load_weights(model_file)
-    validation_error = 0
-    estimate = model.apply(input_data)
-    binarised_estimate = threshold(estimate)
-    print "Jaccard distance: " + str(jaccard_distance(binarised_estimate, output_data))
+    while True:
+        try:
+            epoch_id = model.load_weights(model_file)
+        except EOFError:
+            break
+        print "Epoch " + str(epoch_id)
+        validation_error = 0
+        estimate = model.apply(input_data)
+        binarised_estimate = threshold(estimate)
+        print "Jaccard distance: " + str(jaccard_distance(binarised_estimate, output_data))
 
 def main():
     # Parse command line args

@@ -8,6 +8,24 @@ import crino
 
 NEURALNET_REQUIRED_PARAMS = ['learning_params', 'hidden_geometry', 'pretraining_geometry']
 
+class LoggingNeuralNet(crino.network.PretrainedMLP):
+    def __init__(self, controlling_net, logged_epochs, nUnits, outputActivation=crino.module.Sigmoid, nInputLayers=0, nOutputLayers=0, InputAutoEncoderClass=crino.network.AutoEncoder, OutputAutoEncoderClass=crino.network.OutputAutoEncoder):
+        super(LoggingNeuralNet, self).__init__(nUnits, outputActivation=outputActivation, nInputLayers=nInputLayers, nOutputLayers=nOutputLayers, InputAutoEncoderClass=InputAutoEncoderClass, OutputAutoEncoderClass=OutputAutoEncoderClass)
+        self.controlling_net = controlling_net
+        self.logged_epochs = logged_epochs
+        self.output_file = None
+
+    def setLoggingFile(self, log_file):
+        self.output_file = log_file
+
+    def checkEpochHook(self, finetune_vars):
+        # Dump the network waits if necessary
+        epoch_id = finetune_vars['epoch']
+        if self.output_file != None and epoch_id in self.logged_epochs:
+            print 'Logging epoch ' + str(epoch_id) + '...'
+            self.controlling_net.save_weights(self.output_file, epoch_id)
+        return super(LoggingNeuralNet, self).checkEpochHook(finetune_vars)
+
 class NeuralNetwork(object):
     def __init(self):
         super(NeuralNetwork, self).__init__()
@@ -19,7 +37,7 @@ class NeuralNetwork(object):
         self.network = None
 
     # TODO: Documentation for config format.
-    def initialise(self, features_count, config_values):
+    def initialise(self, features_count, logged_epochs, config_values):
         """
         Initialises the neural network with given configuration values.
 
@@ -38,10 +56,10 @@ class NeuralNetwork(object):
         for param in NEURALNET_REQUIRED_PARAMS:
             if param == None:
                 raise ValueError('Configuration must contain parameter: ' + str(param))
-        self.priv_create_network()
+        self.priv_create_network(logged_epochs)
         self.initialised = True
 
-    def initialise_from_file(self, features_count, config_filepath):
+    def initialise_from_file(self, features_count, logged_epochs, config_filepath):
         """
         Initialises the neural network using a json configuration file.
 
@@ -54,7 +72,7 @@ class NeuralNetwork(object):
             ValueError: If the configuration values were not valid.
         """
         config_values = json.load(open(config_filepath, 'r'))
-        self.initialise(features_count, config_values)
+        self.initialise(features_count, logged_epochs, config_values)
 
     def save_config_to_file(self, config_filepath, weights_filepath=None):
         """
@@ -79,27 +97,34 @@ class NeuralNetwork(object):
         Args:
             weights_file (file): File from which the weights will be loaded.
 
+        Returns:
+            int: Id of the epoch at which the weights were recorded. (-1 if unknown epoch)
+
         Raises:
             IOError: If the file could not be opened/read.
             ValueError: If the loaded weights were not compatible with the network.
         """
         assert self.initialised, "The neural network must be initialised first."
+        epoch_id = pickle.load(weights_file)
         self.network.setParameters(pickle.load(weights_file))
+        return epoch_id
 
-    def save_weights(self, weights_file):
+    def save_weights(self, weights_file, epoch_id=-1):
         """
         Saves all the weights of the neural network to a file.
 
         Args:
             weights_file (file): File in which the weights will be saved.
+            epoch_id (int): Id of the epoch at which the weights were recorded. (-1 if unknown epoch)
 
         Raises:
             IOError: If the file weights could not be written to the file.
         """
         assert self.initialised, "The neural network must be initialised first."
+        pickle.dump(epoch_id, weights_file)
         pickle.dump(self.network.getParameters(), weights_file)
 
-    def train(self, input_patches, output_patches):
+    def train(self, input_patches, output_patches, log_file=None):
         """
         Trains the neural network on the given data.
 
@@ -108,8 +133,10 @@ class NeuralNetwork(object):
         Args:
             input_patches (numpy.ndarray): Input data that will be used to train the network.
             output_patches (numpy.ndarray): Output data that will be used to train the network.
+            log_file (file): File in which the weights will be logged during training.
         """
         assert self.initialised, "The neural network must be initialised first."
+        self.network.setLoggingFile(log_file)
         delta_time = self.network.train(input_patches, output_patches, **self.learning_params)
         print "Training complete (" + str(delta_time) + " seconds)."
 
@@ -136,8 +163,8 @@ class NeuralNetwork(object):
             return output[0]
         return output
 
-    def priv_create_network(self):
-        self.network = crino.network.PretrainedMLP([self.features_count] + self.hidden_geometry + [self.features_count], outputActivation=crino.module.Sigmoid, **self.pretraining_geometry)
+    def priv_create_network(self, logged_epochs):
+        self.network = LoggingNeuralNet(self, logged_epochs, [self.features_count] + self.hidden_geometry + [self.features_count], outputActivation=crino.module.Sigmoid, **self.pretraining_geometry)
         self.network.setInputs(T.matrix('x'), self.features_count)
         self.network.prepare()
         self.network.setCriterion(crino.criterion.CrossEntropy(self.network.getOutputs(), T.matrix('nn_output')))

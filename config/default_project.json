@@ -15,6 +15,7 @@
     "models": [
         {
             "name": "model0",
+            "logging_period": 5,
             "network": {
                 "hidden_geometry": [
                     120,
@@ -44,6 +45,7 @@
         },
         {
             "name": "model1",
+            "logging_period": 5,
             "network": {
                 "hidden_geometry": [
                     200,
