@@ -63,7 +63,6 @@ def main():
                 estimated_binarisation = nn.forward(x_test[i:i+1])
                 y_est=threshold(estimated_binarisation)
                 validation_error[k]+=(1-jaccard_index(y_est[0],y_test[i]))
-                #validation_error[k]+=sum(y_test[0]!=y_test)/float(nTest)
             validation_error[k]=validation_error[k]/float(nTest)
             k+=1
 

@@ -124,7 +124,7 @@ def getConfig(patch_size):
     config['learning_params']={
         'learning_rate' : 0.1,
         'batch_size' : 1,
-        'epochs' : 50,
+        'epochs' : 95,
         'input_pretraining_params' : input_pretraining_params,
         'output_pretraining_params' : output_pretraining_params,
         'link_pretraining' : False
