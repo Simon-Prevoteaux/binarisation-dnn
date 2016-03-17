@@ -80,3 +80,4 @@ config.json
 generation_params.pck
 dataSauvola/*
 results/*
+*.model

@@ -42,6 +42,9 @@ def validate(model, model_filename, model_name, input_data, output_data):
         print 'Jaccard distance: ' + str(jaccard_distances[-1])
     model_file.close()
     plot_validation_results(model_name, epoch_ids, jaccard_distances)
+    jaccard_distances=np.array(jaccard_distances)
+    best_model=epoch_ids[jaccard_distances.argmin()]
+    print 'The best model for ' + model_name + ' is the number ' + str(best_model)
 
 def main():
     # Parse command line args
