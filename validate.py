@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 def jaccard_distance(estimate, ground_truth):
     return 1.0 - np.logical_and(estimate, ground_truth).sum(dtype=np.float_) / np.logical_or(estimate, ground_truth).sum(dtype=np.float_)
 
+def mse_criterion(estimate, ground_truth):
+    return sum(sum((estimate-ground_truth)**2))
+
 def threshold(estimate):
     threshold_value = 0.5
     out = np.zeros(estimate.shape)
@@ -20,13 +23,15 @@ def plot_validation_results(model_name, epoch_ids, jaccard_distances):
     plt.figure()
     plt.title('Model ' + model_name)
     plt.xlabel('Epoch')
-    plt.ylabel('Jaccard distance')
+    #plt.ylabel('Jaccard distance')
+    plt.ylabel('mse distance')
     plt.plot(epoch_ids, jaccard_distances)
 
 def validate(model, model_filename, model_name, input_data, output_data):
     model_file = open(model_filename, 'rb')
     epoch_ids = []
     jaccard_distances = []
+    mse_error=[]
     # For each logged set of weights until we reach EOF
     while True:
         try:
@@ -37,13 +42,19 @@ def validate(model, model_filename, model_name, input_data, output_data):
         # Compute the estimate
         estimate = model.apply(input_data)
         # Compute Jaccard distance between the estimate and the ground truth
-        binarised_estimate = threshold(estimate)
-        jaccard_distances.append(jaccard_distance(binarised_estimate, output_data))
-        print 'Jaccard distance: ' + str(jaccard_distances[-1])
+        # /
+        #binarised_estimate = threshold(estimate)
+        #jaccard_distances.append(jaccard_distance(binarised_estimate, output_data))
+        #print 'Jaccard distance: ' + str(jaccard_distances[-1])
+        # \
+        mse_error.append(mse_criterion(estimate,output_data))
+
     model_file.close()
-    plot_validation_results(model_name, epoch_ids, jaccard_distances)
-    jaccard_distances=np.array(jaccard_distances)
-    best_model=epoch_ids[jaccard_distances.argmin()]
+    plot_validation_results(model_name, epoch_ids, mse_error)
+    #jaccard_distances=np.array(jaccard_distances)
+    mse_error=np.array(mse_error)
+    #best_model=epoch_ids[jaccard_distances.argmin()]
+    best_model=epoch_ids[mse_error.argmin()]
     print 'The best model for ' + model_name + ' is the number ' + str(best_model)
 
 def main():

@@ -56,33 +56,44 @@ def binarize(psize, gen_config, model,test_image):
 
     (width, height) = test_image.size
 
-    #image = np.zeros([width,height])
     image=np.zeros([height,width])
     print pcount
 
     print gen_config
 
-    for j in range(0,pcount-1):
-    #for j in range(80000,85000):
+    #for j in range(0,pcount-1):
+    for j in range(10000,30000):
         data[j,:] = test_image.crop((gen_config[j][0], gen_config[j][1], gen_config[j][0] + psize, gen_config[j][1]+ psize)).getdata()
-        temp=data[j,:]
+        temp=data[j,:]/255.0
+        #a normaliser !!!!!!!
         estimate = model.apply(temp)
         binarised_estimate = threshold(estimate)
 
-        print j
+
+
+        # to have the display patch per patch 
+        # /
         '''
-        plt.subplot(2,1,1)
-        plt.imshow(binarised_estimate.reshape((psize,psize)), interpolation='nearest', cmap=plt.get_cmap('gray'), vmin=0.0, vmax=1.0)
-        plt.subplot(2,1,2)
+        plt.subplot(2,2,1)
+        plt.title('output of the network')
+        plt.imshow(estimate.reshape((psize,psize)), interpolation='nearest', cmap=plt.get_cmap('gray'), vmin=0.0, vmax=1.0)
+        plt.subplot(2,2,2)
+        plt.title('original image')
         plt.imshow(temp.reshape((psize,psize)), interpolation='nearest', cmap=plt.get_cmap('gray'), vmin=0.0, vmax=1.0)
+        plt.subplot(2,2,3)
+        plt.title('binarized image')
+        plt.imshow(binarised_estimate.reshape((psize,psize)), interpolation='nearest', cmap=plt.get_cmap('gray'), vmin=0.0, vmax=1.0)
         plt.show()
         '''
+        # \
+        #
+        
 
         image[gen_config[j][1]:gen_config[j][1] + psize,gen_config[j][0]:gen_config[j][0]+ psize] = binarised_estimate.reshape((psize,psize))
     return image
 
 def threshold(estimate):
-    threshold_value = 0.5
+    threshold_value = 0.4
     out = np.zeros(estimate.shape)
     out[estimate > threshold_value] = 1
     return out
@@ -110,8 +121,6 @@ def main():
 
 	project = Project(project_file)
 
-    
-
 	model_filename = os.path.join(models_dir, model_name + '.model')
 	model=get_modele_from_name(project,model_name)
 
@@ -119,13 +128,13 @@ def main():
 
     test_image=Image.open(test_image_file).convert('F')
 
-    gen_config=exhaustive_gen_config(test_image,[15,15],15)
+    gen_config=exhaustive_gen_config(test_image,[10,10],10)
 
 
-    binarize_image=binarize(15,gen_config,model,test_image)
+    binarize_image=binarize(10,gen_config,model,test_image)
 
     print np.unique(binarize_image)
-    print binarize_image.shape # pas la bonne taille
+    print binarize_image.shape 
     im = Image.fromarray(np.uint8(binarize_image*255))
     im.show()
 

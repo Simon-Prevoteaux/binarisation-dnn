@@ -3,13 +3,13 @@
         "samples": "dataSauvola/train/samples",
         "ground_truth": "dataSauvola/train/groundTruth",
         "generation_type": "random",
-        "patches_per_image": 10
+        "patches_per_image": 30
     },
     "validation": {
         "samples": "dataSauvola/test/samples",
         "ground_truth": "dataSauvola/test/groundTruth",
         "generation_type": "random",
-        "patches_per_image": 10
+        "patches_per_image": 30
     },
     "patch_size": 10,
     "models": [
@@ -24,7 +24,7 @@
                 "learning_params": {
                     "learning_rate": 1.0,
                     "batch_size": 1,
-                    "epochs": 100,
+                    "epochs": 130,
                     "link_pretraining": false,
                     "input_pretraining_params": {
                         "epochs": 10,
@@ -48,13 +48,13 @@
             "logging_period": 5,
             "network": {
                 "hidden_geometry": [
-                    220,
-                    220
+                    200,
+                    200
                 ],
                 "learning_params": {
                     "learning_rate": 1.0,
                     "batch_size": 1,
-                    "epochs": 100,
+                    "epochs": 130,
                     "link_pretraining": false,
                     "input_pretraining_params": {
                         "epochs": 10,
@@ -70,6 +70,66 @@
                 "pretraining_geometry": {
                     "nOutputLayers": 0,
                     "nInputLayers": 0
+                }
+            }
+        },
+        {
+            "name": "model2",
+            "logging_period": 5,
+            "network": {
+                "hidden_geometry": [
+                    500,
+                    500
+                ],
+                "learning_params": {
+                    "learning_rate": 1.0,
+                    "batch_size": 1,
+                    "epochs": 30,
+                    "link_pretraining": false,
+                    "input_pretraining_params": {
+                        "epochs": 10,
+                        "learning_rate": 10,
+                        "batch_size": 1
+                    },
+                    "output_pretraining_params": {
+                        "epochs": 0,
+                        "learning_rate": 10,
+                        "batch_size": 1
+                    }
+                },
+                "pretraining_geometry": {
+                    "nOutputLayers": 0,
+                    "nInputLayers": 0
+                }
+            }
+        },
+        {
+            "name": "model-pretrained",
+            "logging_period": 5,
+            "network": {
+                "hidden_geometry": [
+                    120,
+                    120
+                ],
+                "learning_params": {
+                    "learning_rate": 1.0,
+                    "batch_size": 1,
+                    "epochs": 100,
+                    "link_pretraining": false,
+                    "input_pretraining_params": {
+                        "epochs": 50,
+                        "learning_rate": 1.0,
+                        "batch_size": 1
+                    },
+                    "output_pretraining_params": {
+                        "epochs": 0,
+                        "learning_rate": 10,
+                        "batch_size": 1
+                    }
+                },
+                "pretraining_geometry": {
+                    "nOutputLayers": 0,
+                    "nInputLayers": 1
                 }
             }
         }
