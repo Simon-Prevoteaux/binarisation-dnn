@@ -11,7 +11,7 @@ def jaccard_distance(estimate, ground_truth):
     return 1.0 - np.logical_and(estimate, ground_truth).sum(dtype=np.float_) / np.logical_or(estimate, ground_truth).sum(dtype=np.float_)
 
 def mse_criterion(estimate, ground_truth):
-    return sum(sum((estimate-ground_truth)**2))
+    return np.mean(np.square(estimate - ground_truth))
 
 def threshold(estimate):
     threshold_value = 0.5
@@ -31,7 +31,7 @@ def validate(model, model_filename, model_name, input_data, output_data):
     model_file = open(model_filename, 'rb')
     epoch_ids = []
     jaccard_distances = []
-    mse_error=[]
+    mse_errors = []
     # For each logged set of weights until we reach EOF
     while True:
         try:
@@ -47,14 +47,14 @@ def validate(model, model_filename, model_name, input_data, output_data):
         #jaccard_distances.append(jaccard_distance(binarised_estimate, output_data))
         #print 'Jaccard distance: ' + str(jaccard_distances[-1])
         # \
-        mse_error.append(mse_criterion(estimate,output_data))
+        mse_errors.append(mse_criterion(estimate, output_data))
 
     model_file.close()
-    plot_validation_results(model_name, epoch_ids, mse_error)
+    plot_validation_results(model_name, epoch_ids, mse_errors)
     #jaccard_distances=np.array(jaccard_distances)
-    mse_error=np.array(mse_error)
+    mse_errors = np.array(mse_errors)
     #best_model=epoch_ids[jaccard_distances.argmin()]
-    best_model=epoch_ids[mse_error.argmin()]
+    best_model = epoch_ids[mse_errors.argmin()]
     print 'The best model for ' + model_name + ' is the number ' + str(best_model)
 
 def main():
