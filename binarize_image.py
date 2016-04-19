@@ -7,7 +7,7 @@ import sys
 import os
 import numpy as np
 import theano
-import matplotlib.pyplot as plt
+from PIL import Image
 
 def get_model_from_name(project, model_name):
     for i in range(project.get_models_count()):
@@ -69,11 +69,10 @@ def main():
     patches = data.generate_input_data(genconfig)
     # Binarize the image
     binarized_image = binarize(patches, patch_size, genconfig[test_image_file], model, dataset.open_image(test_image_file).size)
-    # Draw the image
-    print(binarized_image.shape)
-    plt.imshow(binarized_image, cmap='gray')
-    plt.show()
+
+    # Draw the image using PIL for easier image saving method
+    im = Image.fromarray(np.uint8(binarized_image*255))
+    im.show()
 
 if __name__ == '__main__':
     main()
-

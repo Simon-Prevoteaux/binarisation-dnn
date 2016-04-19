@@ -81,6 +81,7 @@ def main():
     print 'Each sample contains ' + str(input_data.shape[1]) + ' pixels.'
     # Validate each model
     for i in range(project.get_models_count()):
+    #TODO : implement a validation method that doesn't need training to be finished, so that validation error could be visualized while the app is still running
         model = project.get_model(i)
         model_name = project.get_model_name(i)
         print 'Validating model ' + model_name + '...'
@@ -91,4 +92,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
