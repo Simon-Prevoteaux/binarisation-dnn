@@ -10,6 +10,7 @@ import theano
 from PIL import Image
 
 def get_model_from_name(project, model_name):
+    # TODO : put this function in the project class
     for i in range(project.get_models_count()):
         if project.get_model_name(i) == model_name:
             return project.get_model(i)

@@ -41,19 +41,17 @@ def validate(model, model_filename, model_name, input_data, output_data):
         print 'Epoch ' + str(epoch_ids[-1])
         # Compute the estimate
         estimate = model.apply(input_data)
+        # In a first time, we used a jaccard criterion to compute the error, but we changed it to a mse one.
         # Compute Jaccard distance between the estimate and the ground truth
         # /
         #binarised_estimate = threshold(estimate)
         #jaccard_distances.append(jaccard_distance(binarised_estimate, output_data))
-        #print 'Jaccard distance: ' + str(jaccard_distances[-1])
         # \
         mse_errors.append(mse_criterion(estimate, output_data))
 
     model_file.close()
     plot_validation_results(model_name, epoch_ids, mse_errors)
-    #jaccard_distances=np.array(jaccard_distances)
     mse_errors = np.array(mse_errors)
-    #best_model=epoch_ids[jaccard_distances.argmin()]
     best_model = epoch_ids[mse_errors.argmin()]
     print 'The best model for ' + model_name + ' is the number ' + str(best_model)
 
