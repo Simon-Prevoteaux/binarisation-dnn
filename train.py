@@ -23,11 +23,14 @@ def main():
     project = Project(project_file)
     # Generate training data
     training_dataset = project.get_training_dataset()
-    training_genconfig = project.get_training_genconfig()
-    input_data = training_dataset.generate_input_data(training_genconfig)
-    output_data = training_dataset.generate_ground_truth_data(training_genconfig)
+    in_training_genconfig = project.get_input_training_genconfig()
+    out_training_genconfig = project.get_output_training_genconfig()
+    input_data = training_dataset.generate_input_data(in_training_genconfig)
+    output_data = training_dataset.generate_ground_truth_data(out_training_genconfig)
     print str(input_data.shape[0]) + " training samples were generated."
-    print "Each sample contains " + str(input_data.shape[1]) + " pixels."
+    print "Each input sample contains " + str(input_data.shape[1]) + " pixels."
+    print "Each out sample contains " + str(output_data.shape[1]) + " pixels."
+
     # Create output directory if necessary
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -41,4 +44,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

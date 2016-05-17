@@ -11,7 +11,8 @@
         "generation_type": "random",
         "patches_per_image": 10
     },
-    "patch_size": 10,
+    "input_patch_size": 20,
+    "output_patch_size": 10,
     "models": [
         {
             "name": "model0",

@@ -38,9 +38,11 @@ class TrainingData(object):
         Raises:
             ValueError: If the dictionary was not a valid configuration dictionary.
         """
-        if not ('patch_size' in config):
-            raise ValueError('Invalid configuration: no patch_size attribute.')
-        self.config = config 
+        if not ('input_patch_size' in config):
+            raise ValueError('Invalid configuration: no patch_size attribute for inputs.')
+        if not ('output_patch_size' in config):
+            raise ValueError('Invalid configuration: no patch_size attribute for outputs.')
+        self.config = config
 
     def load_config_file(self, config_file_name):
         """
@@ -71,7 +73,7 @@ class TrainingData(object):
     def generate_input_data(self, gen_config):
         """
         Creates an array containing the input patches.
-        
+
         Args:
             gen_config: Generation configuration. It is recommended to generate it through one of the methods of this class.
 
@@ -82,12 +84,13 @@ class TrainingData(object):
         Returns:
             numpy.ndarray(dtype=theano.config.floatX): Array containing the input data.
         """
-        return priv_gen_data(self.config, gen_config, self.samples)
+        psize = self.config['input_patch_size']
+        return priv_gen_data(psize, gen_config, self.samples)
 
     def generate_ground_truth_data(self, gen_config):
         """
         Creates an array containing the ground truth patches.
-        
+
         Args:
             gen_config: Generation configuration. It is recommended to generate it through one of the methods of this class.
 
@@ -98,9 +101,10 @@ class TrainingData(object):
         Returns:
             numpy.ndarray(dtype=theano.config.floatX): Array containing the input data.
         """
-        return priv_gen_data(self.config, gen_config, self.ground_truth)
+        psize = self.config['output_patch_size']
+        return priv_gen_data(psize, gen_config, self.ground_truth)
 
-    def random_gen_config(self, patches_per_image):
+    def random_gen_config(self, patches_per_image,psize):
         """
         Creates a generation configuration containing random patches of the images.
 
@@ -115,7 +119,6 @@ class TrainingData(object):
         else:
             files = self.samples.common_images(self.ground_truth)
         gen_config = {}
-        psize = self.config['patch_size']
         for imgname in files:
             (width, height) = self.samples.open_image(imgname).size
             gen_config[imgname] = np.concatenate((
@@ -178,9 +181,8 @@ class TrainingData(object):
         """
         pickle.dump(gen_config, open(filename, 'w+'))
 
-def priv_gen_data(config, gen_config, dataset):
+def priv_gen_data(psize, gen_config, dataset):
     pcount = sum([coords.shape[0] for coords in gen_config.itervalues()])
-    psize = config['patch_size']
     data = np.empty([pcount, psize * psize], theano.config.floatX)
     i = 0
     for (imgname, coords) in gen_config.iteritems():
@@ -193,4 +195,3 @@ def priv_gen_data(config, gen_config, dataset):
             data[i, :] = img.crop((x, y, x + psize, y + psize)).getdata()
             i += 1
     return data / 255.0
-

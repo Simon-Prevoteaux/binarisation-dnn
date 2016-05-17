@@ -72,11 +72,14 @@ def main():
     project = Project(project_file)
     # Generate validation data
     validation_dataset = project.get_validation_dataset()
-    validation_genconfig = project.get_validation_genconfig()
-    input_data = validation_dataset.generate_input_data(validation_genconfig)
-    output_data = validation_dataset.generate_ground_truth_data(validation_genconfig)
-    print str(input_data.shape[0]) + ' validation samples were generated.'
-    print 'Each sample contains ' + str(input_data.shape[1]) + ' pixels.'
+    in_validation_genconfig = project.get_input_validation_genconfig()
+    out_validation_genconfig = project.get_output_validation_genconfig()
+
+    input_data = validation_dataset.generate_input_data(in_validation_genconfig)
+    output_data = validation_dataset.generate_ground_truth_data(out_validation_genconfig)
+    print str(input_data.shape[0]) + " training samples were generated."
+    print "Each input sample contains " + str(input_data.shape[1]) + " pixels."
+    print "Each out sample contains " + str(output_data.shape[1]) + " pixels."
     # Validate each model
     for i in range(project.get_models_count()):
     #TODO : implement a validation method that doesn't need training to be finished, so that validation error could be visualized while the app is still running

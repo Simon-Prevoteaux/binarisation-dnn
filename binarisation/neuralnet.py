@@ -37,18 +37,20 @@ class NeuralNetwork(object):
         self.network = None
 
     # TODO: Documentation for config format.
-    def initialise(self, features_count, logged_epochs, config_values):
+    def initialise(self, input_features_count,output_features_count, logged_epochs, config_values):
         """
         Initialises the neural network with given configuration values.
 
         Args:
-            features_count (int): Size of the input vectors.
+            intput_features_count(int) : Size of the input vectors.
+            output_features_count (int): Size of the output vectors.
             config_values (dict): Configuration values for the neural network.
 
         Raises:
             ValueError: If the configuration values were not valid.
         """
-        self.features_count = features_count
+        self.input_features_count = input_features_count
+        self.output_features_count = output_features_count
         for k, v in config_values.items():
             if not k in NEURALNET_REQUIRED_PARAMS:
                 raise ValueError('Unknown configuration parameter: ' + str(k))
@@ -59,12 +61,13 @@ class NeuralNetwork(object):
         self.priv_create_network(logged_epochs)
         self.initialised = True
 
-    def initialise_from_file(self, features_count, logged_epochs, config_filepath):
+    def initialise_from_file(self, input_features_count,output_features_count , logged_epochs, config_filepath):
         """
         Initialises the neural network using a json configuration file.
 
         Args:
-            features_count (int): Size of the input vectors.
+            intput_features_count(int) : Size of the input vectors.
+            output_features_count (int): Size of the output vectors.
             config_filepath (str): Path of the configuration file.
 
         Raises:
@@ -72,7 +75,7 @@ class NeuralNetwork(object):
             ValueError: If the configuration values were not valid.
         """
         config_values = json.load(open(config_filepath, 'r'))
-        self.initialise(features_count, logged_epochs, config_values)
+        self.initialise(input_size,output_size, logged_epochs, config_values)
 
     def save_config_to_file(self, config_filepath, weights_filepath=None):
         """
@@ -170,8 +173,7 @@ class NeuralNetwork(object):
         return output
 
     def priv_create_network(self, logged_epochs):
-        self.network = LoggingNeuralNet(self, logged_epochs, [self.features_count] + self.hidden_geometry + [self.features_count], outputActivation=crino.module.Sigmoid, **self.pretraining_geometry)
-        self.network.setInputs(T.matrix('x'), self.features_count)
+        self.network = LoggingNeuralNet(self, logged_epochs, [self.input_features_count] + self.hidden_geometry + [self.output_features_count], outputActivation=crino.module.Sigmoid, **self.pretraining_geometry)
+        self.network.setInputs(T.matrix('x'), self.input_features_count)
         self.network.prepare()
         self.network.setCriterion(crino.criterion.CrossEntropy(self.network.getOutputs(), T.matrix('nn_output')))
-
